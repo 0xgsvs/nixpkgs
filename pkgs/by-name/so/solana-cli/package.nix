@@ -15,20 +15,25 @@
   rocksdb,
   # Taken from https://github.com/anza-xyz/agave/blob/master/scripts/cargo-install-all.sh#L84
   solanaPkgs ? [
+    # AGAVE_BINS_END_USER
+    "agave-install"
+    "solana"
+    "solana-keygen"
+    # AGAVE_BINS_VAL_OP
+    "agave-validator"
+    "agave-watchtower"
+    "solana-gossip"
+    "solana-faucet"
+    # AGAVE_BINS_DEV
+    "solana-test-validator"
+    # platform-tools (installed separately upstream but needed for dev)
     "cargo-build-sbf"
     "cargo-test-sbf"
-    "solana"
-    "solana-bench-tps"
-    "solana-faucet"
-    "solana-gossip"
-    "agave-install"
-    "solana-keygen"
-    "agave-ledger-tool"
-    "solana-dos"
-    "solana-net-shaper"
-    "agave-validator"
-    "solana-test-validator"
-    "agave-watchtower"
+
+    # "solana-bench-tps"
+    # "agave-ledger-tool"
+    # "solana-dos"
+    # "solana-net-shaper"
   ]
   ++ [
     # XXX: Ensure `solana-genesis` is built LAST!
@@ -37,8 +42,8 @@
   ],
 }:
 let
-  version = "3.0.12";
-  hash = "sha256-Zubu7cTSJrJFSuguCo3msdas/QshFpo1+T6DVQyqrhY=";
+  version = "3.1.12";
+  hash = "sha256-IGsYQNHLnDvvRsRYW3DcWe9oBlLSpw3anjTM3BLOrx4=";
 in
 rustPlatform.buildRustPackage rec {
   pname = "solana-cli";
@@ -51,13 +56,13 @@ rustPlatform.buildRustPackage rec {
     inherit hash;
   };
 
-  cargoHash = "sha256-qnZbFkyzE2hdy/ynZQZmCs5kCeTUMci9f/pVKID/mRQ=";
+  cargoHash = "sha256-8aFQs5Vhj65ujYMc7487rAydC44wM7ELbOhHHB7Af2E=";
 
   strictDeps = true;
   cargoBuildFlags = map (n: "--bin=${n}") solanaPkgs;
 
   env = {
-    RUSTFLAGS = "-Amismatched_lifetime_syntaxes -Adead_code -Aunused_parens -Aunused_imports";
+    RUSTFLAGS = "-Amismatched_lifetime_syntaxes -Adead_code -Aunused_parens -Aunused_imports -Ainteger_to_ptr_transmutes -Aunused_unsafe";
     LIBCLANG_PATH = "${libclang.lib}/lib";
 
     # Used by build.rs in the rocksdb-sys crate. If we don't set these, it would
